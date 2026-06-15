@@ -1,0 +1,14 @@
+{
+  "template_version": "3.0",
+  "phase": "P1",
+  "state": "waiting_for_inputs",
+  "approvals": {
+    "input_sufficient": false,
+    "scheme_selected": false,
+    "prompts_approved": false,
+    "browser_submission_approved": false
+  },
+  "selected_scheme": null,
+  "updated_at": null,
+  "next_action": "将资料放入 01_inputs"
+}

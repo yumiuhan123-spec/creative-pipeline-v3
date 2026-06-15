@@ -1,0 +1,43 @@
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+
+.env
+.env.*
+*.pem
+*.key
+install.json
+
+node_modules/
+npm-debug.log*
+__pycache__/
+*.py[cod]
+
+EdgeProfile/
+browser_profile/
+edge_cdp_profile/
+**/Cookies
+**/Cookies-journal
+**/Login Data*
+**/History*
+**/Sessions/
+**/Session Storage/
+**/Local State
+
+**/07_browser_jobs/run_log.jsonl
+**/07_browser_jobs/tab_assignments.json
+**/07_browser_jobs/failures/*
+**/08_outputs/*
+!**/08_outputs/说明.md
+
+**/01_inputs/product_views/three_view/*
+**/01_inputs/product_views/details/*
+**/01_inputs/competitor_main_images/*
+**/01_inputs/reviews/raw/*
+**/01_inputs/reviews/structured/*
+**/01_inputs/brand_assets/*
+**/01_inputs/other_references/*
+
+!**/.gitkeep

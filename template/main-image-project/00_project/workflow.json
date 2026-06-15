@@ -1,0 +1,75 @@
+{
+  "workflow_version": "3.0",
+  "input_root": "01_inputs",
+  "state_file": "00_project/status.json",
+  "human_review": {
+    "entry": "人工审核区/人工审核与修改说明.md",
+    "scheme_drafts": "04_scheme_drafts",
+    "selected_scheme": "05_selected_scheme",
+    "prompt_drafts": "06_prompts/draft",
+    "final_prompts": "06_prompts/final"
+  },
+  "project_creation": {
+    "instruction": "可编辑工作流提示词/P0_项目创建指令.md",
+    "script": "00_project/scripts/copy_template.ps1"
+  },
+  "phases": [
+    {
+      "id": "P1",
+      "name": "输入盘点",
+      "instruction": "可编辑工作流提示词/P1_输入盘点指令.md",
+      "outputs": [
+        "02_inventory/input_manifest.json",
+        "02_inventory/missing_information.md",
+        "02_inventory/source_notes.md"
+      ],
+      "gate": "G1_INPUT_READY"
+    },
+    {
+      "id": "P2",
+      "name": "综合分析",
+      "instruction": "可编辑工作流提示词/P2_综合分析指令.md",
+      "outputs": [
+        "03_analysis/analysis_result.md",
+        "03_analysis/evidence_table.md"
+      ],
+      "gate": null
+    },
+    {
+      "id": "P3",
+      "name": "三套方案",
+      "instruction": "可编辑工作流提示词/P3_方案生成指令.md",
+      "outputs": [
+        "04_scheme_drafts/scheme_A.md",
+        "04_scheme_drafts/scheme_B.md",
+        "04_scheme_drafts/scheme_C.md",
+        "04_scheme_drafts/scheme_comparison.md"
+      ],
+      "gate": "G2_SCHEME_SELECTED"
+    },
+    {
+      "id": "P4",
+      "name": "六份提示词",
+      "instruction": "可编辑工作流提示词/P4_提示词生成指令.md",
+      "outputs": [
+        "06_prompts/draft/01.txt",
+        "06_prompts/draft/02.txt",
+        "06_prompts/draft/03.txt",
+        "06_prompts/draft/04.txt",
+        "06_prompts/draft/05.txt",
+        "06_prompts/draft/06.txt"
+      ],
+      "gate": "G3_PROMPTS_APPROVED"
+    },
+    {
+      "id": "P5",
+      "name": "浏览器并发生成",
+      "instruction": "可编辑工作流提示词/P5_浏览器分发指令.md",
+      "outputs": [
+        "07_browser_jobs/tab_assignments.json",
+        "07_browser_jobs/run_log.jsonl"
+      ],
+      "gate": "G4_SUBMISSION_APPROVED"
+    }
+  ]
+}

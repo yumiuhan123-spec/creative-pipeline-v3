@@ -1,0 +1,12 @@
+{
+  "status": "draft",
+  "approved_at": null,
+  "prompts": [
+    {"image": 1, "file": "final/01.txt", "status": "empty", "reference_files": []},
+    {"image": 2, "file": "final/02.txt", "status": "empty", "reference_files": []},
+    {"image": 3, "file": "final/03.txt", "status": "empty", "reference_files": []},
+    {"image": 4, "file": "final/04.txt", "status": "empty", "reference_files": []},
+    {"image": 5, "file": "final/05.txt", "status": "empty", "reference_files": []},
+    {"image": 6, "file": "final/06.txt", "status": "empty", "reference_files": []}
+  ]
+}

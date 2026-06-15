@@ -1,0 +1,20 @@
+template_version: "3.0"
+project_id: ""
+project_name: ""
+product_name: ""
+platform: ""
+market: ""
+language: "zh-CN"
+created_at: ""
+copied_from_template: true
+final_image_count: 6
+candidate_scheme_count: 3
+category_library_version: "1.0"
+p1_instruction: "可编辑工作流提示词/P1_输入盘点指令.md"
+p2_instruction: "可编辑工作流提示词/P2_综合分析指令.md"
+p3_instruction: "可编辑工作流提示词/P3_方案生成指令.md"
+p4_instruction: "可编辑工作流提示词/P4_提示词生成指令.md"
+p5_instruction: "可编辑工作流提示词/P5_浏览器分发指令.md"
+browser_launcher: "07_browser_jobs/scripts/ensure_edge.ps1"
+browser_launcher_shell: "powershell.exe -NoProfile -ExecutionPolicy Bypass -File"
+notes: ""

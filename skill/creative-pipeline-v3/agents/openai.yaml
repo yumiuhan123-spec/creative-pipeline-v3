@@ -1,0 +1,4 @@
+interface:
+  display_name: "主图方案生成 V3"
+  short_description: "从零散产品资料生成六张主图方案并提交 ChatGPT"
+  default_prompt: "使用 $creative-pipeline-v3 读取当前项目文件并继续主图方案生成流程。"

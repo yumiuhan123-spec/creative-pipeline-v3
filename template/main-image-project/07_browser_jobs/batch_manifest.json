@@ -1,0 +1,18 @@
+{
+  "status": "not_ready",
+  "cdp_endpoint": "http://127.0.0.1:9222",
+  "target_site": "https://chatgpt.com/",
+  "edge_launcher": "scripts/ensure_edge.ps1",
+  "edge_launcher_command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"07_browser_jobs/scripts/ensure_edge.ps1\"",
+  "auto_start_edge": true,
+  "tab_count": 6,
+  "submit": false,
+  "jobs": [
+    {"tab": 1, "prompt_file": "06_prompts/final/01.txt", "reference_files": []},
+    {"tab": 2, "prompt_file": "06_prompts/final/02.txt", "reference_files": []},
+    {"tab": 3, "prompt_file": "06_prompts/final/03.txt", "reference_files": []},
+    {"tab": 4, "prompt_file": "06_prompts/final/04.txt", "reference_files": []},
+    {"tab": 5, "prompt_file": "06_prompts/final/05.txt", "reference_files": []},
+    {"tab": 6, "prompt_file": "06_prompts/final/06.txt", "reference_files": []}
+  ]
+}

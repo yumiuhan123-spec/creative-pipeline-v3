@@ -1,0 +1,10 @@
+{
+  "name": "creative-pipeline-v3-runtime",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Browser runtime dependencies for Creative Pipeline V3",
+  "license": "MIT",
+  "dependencies": {
+    "playwright": "^1.60.0"
+  }
+}
