@@ -30,6 +30,22 @@ $yaml = $yaml -replace '(?m)^project_name:.*$', "project_name: `"$name`""
 $yaml = $yaml -replace '(?m)^created_at:.*$', "created_at: `"$created`""
 Set-Content -LiteralPath $projectYaml -Value $yaml -Encoding UTF8
 
+$projectConfig = Join-Path $destinationFull "00_project\project.config.json"
+if (Test-Path -LiteralPath $projectConfig -PathType Leaf) {
+    $config = Get-Content -LiteralPath $projectConfig -Raw -Encoding UTF8 | ConvertFrom-Json
+    $config.project_name = $name
+    $config | Add-Member -NotePropertyName "project_id" -NotePropertyValue $id -Force
+    $config | Add-Member -NotePropertyName "created_at" -NotePropertyValue $created -Force
+    $config | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $projectConfig -Encoding UTF8
+}
+
+$workflowState = Join-Path $destinationFull "00_project\workflow.state.json"
+if (Test-Path -LiteralPath $workflowState -PathType Leaf) {
+    $state = Get-Content -LiteralPath $workflowState -Raw -Encoding UTF8 | ConvertFrom-Json
+    $state.last_updated = $created
+    $state | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $workflowState -Encoding UTF8
+}
+
 [pscustomobject]@{
     status = "created"
     project = $destinationFull

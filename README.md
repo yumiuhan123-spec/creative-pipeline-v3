@@ -1,8 +1,21 @@
 # Creative Pipeline V3
 
-一个面向 Codex 的文件驱动主图方案生成工作流。
+Creative Pipeline V3 是一个面向 Codex 的文件驱动工作流，用来把零散产品资料整理成主图方案，并通过已登录的 Edge/ChatGPT 页面并发提交六张主图提示词。
 
-它把零散产品资料整理为三套六图候选方案，经人工选择后生成六份适合 Image 2 一类图像模型的自然语言提示词，最后通过已登录的 Microsoft Edge 在六个 ChatGPT 标签页中并发提交。
+当前版本：`3.1.0`，定位为“项目架构标准化版”。
+
+## 四个位置
+
+这个项目按四个位置组织，避免源码、模板、真实项目和历史版本混在一起。
+
+```text
+开发室：本仓库
+模板室：template/main-image-project
+工作室：用户从模板复制出来的具体产品项目
+档案室：本地版本档案目录，默认建议放在桌面
+```
+
+开发室只修改工具本身。模板室只放干净母版。工作室放真实素材和运行结果。档案室只保存发布快照，不用于继续开发。
 
 ## 工作流程
 
@@ -17,29 +30,23 @@ P1 输入盘点
 -> P5 六个 ChatGPT 页面并发提交
 ```
 
-复杂分析由 Codex 完成。脚本只负责文件清单、项目复制、浏览器启动、参考文件上传和并发提交。
+复杂分析由 Codex 完成。脚本只负责确定性的动作，例如安装、复制模板、检查环境、启动 Edge、分发提示词。
 
-## 系统要求
+## 安装
+
+要求：
 
 - Windows 10 或 Windows 11
 - Codex Desktop
 - Microsoft Edge
-- Node.js 20 或更新版本与 npm，或者 Codex Desktop 自带的 Node/Playwright 运行环境
-- 可以登录并使用 ChatGPT 图片生成的账号
+- 可使用图片生成的 ChatGPT 账号
+- Node.js 20+ 与 npm，或 Codex Desktop 自带的 Node/Playwright 运行环境
 
-## 安装
-
-克隆或下载仓库后，在 PowerShell 中运行：
+安装：
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\install.ps1"
 ```
-
-安装程序会：
-
-- 将 Skill 安装到 `$CODEX_HOME/skills/creative-pipeline-v3`
-- 未设置 `CODEX_HOME` 时安装到 `~/.codex/skills/creative-pipeline-v3`
-- 将 Playwright 运行依赖安装到 `%LOCALAPPDATA%\CreativePipelineV3\runtime`
 
 检查环境：
 
@@ -47,7 +54,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\install.ps1"
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\doctor.ps1"
 ```
 
-安装后重新打开 Codex，使 Skill 出现在可用 Skill 列表中。
+安装后重新打开 Codex，让 Skill 出现在可用 Skill 列表中。
 
 ## 创建产品项目
 
@@ -57,11 +64,11 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\new-project.p
   -ProjectName "产品名称"
 ```
 
-也可以手工复制 `template/main-image-project` 并使用产品名称重命名。
+也可以手工复制 `template/main-image-project` 并用产品名称重命名。
 
 ## 放置输入资料
 
-将资料放入产品项目的 `01_inputs`：
+把资料放进产品项目的 `01_inputs`：
 
 ```text
 01_inputs/
@@ -86,30 +93,41 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\new-project.p
 使用 $creative-pipeline-v3 运行当前项目。先执行 P1，检查输入资料并停下来等我确认。
 ```
 
-每个阶段结束后，按照 Codex 提示进行确认。
+每个阶段结束后，按照 Codex 提示进行确认。P3 和 P4 的结果可以通过项目中的 `人工审核区` 打开和修改。
 
-P3 和 P4 的结果可以通过项目中的 `人工审核区` 打开。修改工作方法则编辑 `可编辑工作流提示词`。
+## 第一轮浏览器登录
 
-## 第一次浏览器登录
-
-第一次进入 P5 时，工作流会启动一个独立的 Edge 配置：
+第一次进入 P5 时，工作流会启动一个独立 Edge 配置：
 
 ```text
 %LOCALAPPDATA%\CreativePipelineV3\EdgeProfile
 ```
 
-用户需要手工登录一次 ChatGPT。之后登录状态会保留，后续项目可以复用。
+用户需要手动登录一次 ChatGPT。之后登录状态会保留，后续项目可以复用。
 
 不要提交或分享该 Edge Profile。它可能包含 Cookie、会话和账号信息。
 
 ## 项目结构
 
-- `skill/creative-pipeline-v3`：Codex Skill
-- `template/main-image-project`：标准项目母版
-- `scripts/install.ps1`：安装 Skill 和依赖
-- `scripts/new-project.ps1`：创建产品项目
-- `scripts/doctor.ps1`：检查运行环境
-- `scripts/uninstall.ps1`：卸载 Skill 和本地运行环境
+```text
+skill/                     # Codex Skill
+template/main-image-project # 标准项目母版
+scripts/                   # 安装、诊断、复制模板和维护脚本
+docs/                      # 架构和开发文档
+versioning/                # 后续完整版本管理器的设计位置
+examples/                  # 脱敏示例
+tests/                     # 自动测试和弱 Codex 测试
+```
+
+## 版本管理
+
+临时的本地小版本发布脚本已经在 `3.1.0` 中移除。后续版本管理会升级为独立模块，计划接入 DeepSeek API 自动分析更新内容、建议版本号、生成变更说明，并写入版本档案。
+
+当前占位说明见：
+
+```text
+versioning/README.md
+```
 
 ## 当前限制
 
@@ -120,7 +138,7 @@ P3 和 P4 的结果可以通过项目中的 `人工审核区` 打开。修改工
 
 ## 隐私
 
-不要把产品机密资料、客户隐私数据、浏览器 Profile、Cookie、登录数据、会话文件或已经填写的真实产品项目提交到 Git。
+不要把产品机密资料、客户隐私数据、浏览器 Profile、Cookie、登录数据、会话文件或真实产品项目提交到 Git。
 
 ## License
 

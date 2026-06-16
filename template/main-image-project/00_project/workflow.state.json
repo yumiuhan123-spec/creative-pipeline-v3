@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "workflow_version": "3.1.0",
+  "current_stage": "P1",
+  "completed_stages": [],
+  "next_allowed_stages": [
+    "P1"
+  ],
+  "human_gates": {
+    "input_confirmed": false,
+    "scheme_selected": false,
+    "prompts_approved": false,
+    "browser_submission_approved": false
+  },
+  "selected_scheme": null,
+  "last_updated": null,
+  "notes": "Initial template state. Future versions may use this file to resume from the middle of the workflow."
+}

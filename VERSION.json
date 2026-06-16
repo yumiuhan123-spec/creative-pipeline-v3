@@ -1,7 +1,7 @@
 {
   "name": "creative-pipeline-v3",
-  "version": "3.0.0",
-  "status": "public-preview",
+  "version": "3.1.0",
+  "status": "architecture-standardization",
   "platform": "windows",
   "browser": "microsoft-edge-cdp",
   "workflow_end": "six-chatgpt-image-jobs-submitted"

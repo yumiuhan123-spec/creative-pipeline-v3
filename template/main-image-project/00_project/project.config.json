@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "project_type": "main-image-project",
+  "template_version": "3.1.0",
+  "project_name": "",
+  "directories": {
+    "inputs": "01_inputs",
+    "inventory": "02_inventory",
+    "analysis": "03_analysis",
+    "scheme_drafts": "04_scheme_drafts",
+    "selected_scheme": "05_selected_scheme",
+    "prompts": "06_prompts",
+    "browser_jobs": "07_browser_jobs",
+    "outputs": "08_outputs",
+    "archive": "99_archive"
+  },
+  "browser": {
+    "provider": "microsoft-edge-cdp",
+    "chatgpt_login_required": true,
+    "submit_jobs": false
+  }
+}

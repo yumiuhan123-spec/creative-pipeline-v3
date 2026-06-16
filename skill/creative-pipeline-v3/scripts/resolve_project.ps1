@@ -35,6 +35,20 @@ else {
 
 $workflow = Get-Content -LiteralPath (Join-Path $resolved "00_project\workflow.json") -Raw -Encoding UTF8 | ConvertFrom-Json
 $status = Get-Content -LiteralPath (Join-Path $resolved "00_project\status.json") -Raw -Encoding UTF8 | ConvertFrom-Json
+$projectConfigPath = Join-Path $resolved "00_project\project.config.json"
+$workflowStatePath = Join-Path $resolved "00_project\workflow.state.json"
+$projectConfig = if (Test-Path -LiteralPath $projectConfigPath -PathType Leaf) {
+    Get-Content -LiteralPath $projectConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json
+}
+else {
+    $null
+}
+$workflowState = if (Test-Path -LiteralPath $workflowStatePath -PathType Leaf) {
+    Get-Content -LiteralPath $workflowStatePath -Raw -Encoding UTF8 | ConvertFrom-Json
+}
+else {
+    $null
+}
 $phase = $workflow.phases | Where-Object { $_.id -eq $status.phase } | Select-Object -First 1
 if (-not $phase) {
     throw "Unknown current phase: $($status.phase)"
@@ -48,4 +62,6 @@ if (-not $phase) {
     gate = $phase.gate
     state = $status.state
     next_action = $status.next_action
+    project_name = if ($projectConfig) { $projectConfig.project_name } else { $null }
+    workflow_state = if ($workflowState) { $workflowState.current_stage } else { $null }
 } | ConvertTo-Json

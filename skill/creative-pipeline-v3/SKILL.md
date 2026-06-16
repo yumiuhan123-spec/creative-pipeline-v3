@@ -8,6 +8,18 @@ description: Run a file-driven main-image planning workflow from scattered produ
 Treat the project folder as the source of truth. Keep this Skill as a thin
 orchestrator; do not duplicate P1-P5 business instructions here.
 
+## V3.1 Architecture Files
+
+When present, read these project-local files before phase work:
+
+- `00_project/project.config.json`: project identity, directory map, and browser policy.
+- `00_project/workflow.state.json`: forward-looking stage ledger for resume and audit.
+- `00_project/status.json`: compatibility source for the active phase in V3.1.
+
+V3.1 establishes the architecture files, but it does not fully replace
+`status.json` yet. Use `status.phase` to choose the current P1-P5 phase, and
+update `workflow.state.json` alongside `status.json` when the phase changes.
+
 ## Resolve The Project
 
 1. Use a project path explicitly supplied by the user.
