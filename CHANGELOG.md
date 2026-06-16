@@ -1,4 +1,4 @@
-# Changelog
+﻿# Changelog
 
 所有重要变化记录在这里。版本号遵循语义化版本思路：
 
@@ -6,6 +6,15 @@
 - minor：新增功能且兼容旧项目，例如 `3.0.1 -> 3.1.0`
 - major：架构大改或不兼容旧项目，例如 `3.x -> 4.0.0`
 
+## 3.2.1 - 2026-06-16
+
+### Changed
+
+- 补入项目管理器一键发布总控和开发工作台自动收尾 skill
+
+### Risks
+
+- DeepSeek was not called. Local fallback text needs manual review.
 ## 3.2.0 - 2026-06-16
 
 ### Added
@@ -57,3 +66,4 @@
 
 - 首次整理为可上传 GitHub 的公开项目结构。
 - 包含 Codex Skill、标准项目模板、安装脚本、环境检查脚本和浏览器分发脚本。
+
