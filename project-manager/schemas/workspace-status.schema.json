@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Creative Pipeline Workspace Status",
+  "type": "object",
+  "required": ["workspace_root", "rooms", "versions", "git", "archives", "recommendations"],
+  "properties": {
+    "workspace_root": { "type": "string" },
+    "rooms": { "type": "object" },
+    "versions": { "type": "object" },
+    "git": { "type": "object" },
+    "archives": { "type": "object" },
+    "recommendations": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+# Project Manager
+
+Project Manager keeps the Creative Pipeline four-room workspace maintainable.
+It is independent from the main-image P1-P5 workflow and independent from the version manager.
+
+## Commands
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" status
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" version-map
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" check-archives
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" sync-template -DryRun
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" sync-template -Approve
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" rebuild-archive -Tag v3.2.0 -DryRun
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" rebuild-archive -Tag v3.2.0 -Approve
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" release -DryRun -SkipAI -BumpOverride patch -ReleaseIntent "Describe the completed change"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" release -Approve -SkipAI -BumpOverride patch -ReleaseIntent "Describe the completed change"
+```
+
+## Safety
+
+- `status`, `version-map`, and `check-archives` are read-only.
+- `sync-template` backs up the current template before replacing it.
+- `rebuild-archive` creates archives from Git tags and does not touch working projects.
+- `release` runs the version manager, uses the four-room archive root, previews template sync, and reports final workspace status.
+- Write operations require `-Approve`; use `-DryRun` to preview.
+- The manager never copies from the studio back into the template room.
