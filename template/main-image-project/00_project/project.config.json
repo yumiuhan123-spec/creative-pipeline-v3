@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "project_type": "main-image-project",
-  "template_version": "3.1.0",
+  "template_version": "3.2.0",
   "project_name": "",
   "directories": {
     "inputs": "01_inputs",
@@ -18,5 +18,20 @@
     "provider": "microsoft-edge-cdp",
     "chatgpt_login_required": true,
     "submit_jobs": false
+  },
+  "execution": {
+    "mode": "standard",
+    "allowed_modes": [
+      "standard",
+      "quick"
+    ],
+    "quick_mode_requires_explicit_request": true,
+    "quick_mode_policy": {
+      "skip_human_gates": true,
+      "auto_select_scheme": true,
+      "auto_approve_prompts": true,
+      "auto_approve_browser_submission": true,
+      "record_assumptions": true
+    }
   }
 }

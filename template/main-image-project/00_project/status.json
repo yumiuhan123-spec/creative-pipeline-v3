@@ -1,5 +1,6 @@
 {
-  "template_version": "3.0",
+  "template_version": "3.2.0",
+  "execution_mode": "standard",
   "phase": "P1",
   "state": "waiting_for_inputs",
   "approvals": {
@@ -9,6 +10,7 @@
     "browser_submission_approved": false
   },
   "selected_scheme": null,
+  "auto_decisions": [],
   "updated_at": null,
   "next_action": "将资料放入 01_inputs"
 }

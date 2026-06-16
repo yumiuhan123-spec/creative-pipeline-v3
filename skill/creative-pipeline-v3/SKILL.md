@@ -20,6 +20,35 @@ V3.1 establishes the architecture files, but it does not fully replace
 `status.json` yet. Use `status.phase` to choose the current P1-P5 phase, and
 update `workflow.state.json` alongside `status.json` when the phase changes.
 
+## Execution Modes
+
+The default execution mode is `standard`. In standard mode, stop at every human
+gate and wait for explicit approval.
+
+Quick mode is allowed only when the user explicitly asks for quick mode in the
+current request, or when `00_project/project.config.json` sets
+`execution.mode` to `quick`. Do not infer quick mode from urgency or silence.
+
+In quick mode:
+
+1. Read the quick-mode instruction declared by `workflow.run_modes.quick.instruction`
+   when present. In the default template this is
+   `可编辑工作流提示词/P6_快速模式指令.md`.
+2. Continue from P1 through P5 without stopping at ordinary P1/P3/P4 approval
+   gates.
+3. Still stop if critical product inputs are missing, if product claims cannot
+   be verified, if ChatGPT login is not confirmed, or if browser preflight fails.
+4. At P3, generate three schemes, then choose the strongest scheme or a reasoned
+   hybrid automatically. Write the final choice into
+   `05_selected_scheme/selected_scheme.md` and explain the decision in
+   `05_selected_scheme/selection_notes.md`.
+5. At P4, write both `06_prompts/draft/*.txt` and `06_prompts/final/*.txt`, then
+   mark `06_prompts/prompt_index.json` as `approved`.
+6. Before P5, set the project approval fields needed for browser submission and
+   set `07_browser_jobs/batch_manifest.json` `submit` to `true`.
+7. Record all automatic decisions and assumptions in `00_project/decisions.md`
+   and `00_project/workflow.state.json`.
+
 ## Resolve The Project
 
 1. Use a project path explicitly supplied by the user.
@@ -60,6 +89,9 @@ or other main functionality without editing the Skill.
 - P3: Produce three six-image schemes; stop for human selection.
 - P4: Produce six prompt drafts; stop for human approval before finalizing.
 - P5: Run the project browser wrapper only after all project approvals pass.
+
+In quick mode, the P3 and P4 stops become automatic decision records instead of
+conversation pauses. Critical blockers still stop the run.
 
 The phase instruction defines the detailed behavior and required files.
 

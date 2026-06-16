@@ -2,7 +2,7 @@
 
 Creative Pipeline V3 是一个面向 Codex 的文件驱动工作流，用来把零散产品资料整理成主图方案，并通过已登录的 Edge/ChatGPT 页面并发提交六张主图提示词。
 
-当前版本：`3.1.0`，定位为“项目架构标准化版”。
+当前版本：`3.2.0`，定位为“快速模式功能版”。
 
 ## 四个位置
 
@@ -94,6 +94,23 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\new-project.p
 ```
 
 每个阶段结束后，按照 Codex 提示进行确认。P3 和 P4 的结果可以通过项目中的 `人工审核区` 打开和修改。
+
+## 快速模式
+
+标准模式会在 P1、P3、P4 和 P5 前后等待人工确认。快速模式会让 Codex 从读取素材一路执行到六个 ChatGPT 生图任务提交完成。
+
+启动语：
+
+```text
+使用 $creative-pipeline-v3 以快速模式运行当前项目，从 P1 连续执行到 P5，自动选择方案、生成 final 提示词并提交六个 ChatGPT 生图任务。请把所有自动判断写入项目文件。
+```
+
+快速模式仍然会在关键资料缺失、卖点无法验证、ChatGPT 未登录或浏览器 preflight 失败时停止。详细规则见：
+
+```text
+docs/quick-mode.md
+template/main-image-project/可编辑工作流提示词/P6_快速模式指令.md
+```
 
 ## 第一轮浏览器登录
 

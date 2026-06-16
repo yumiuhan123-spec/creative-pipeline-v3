@@ -1,6 +1,7 @@
 {
   "schema_version": "1.0",
-  "workflow_version": "3.1.0",
+  "workflow_version": "3.2.0",
+  "execution_mode": "standard",
   "current_stage": "P1",
   "completed_stages": [],
   "next_allowed_stages": [
@@ -14,5 +15,11 @@
   },
   "selected_scheme": null,
   "last_updated": null,
-  "notes": "Initial template state. Future versions may use this file to resume from the middle of the workflow."
+  "automation": {
+    "quick_mode_requested": false,
+    "quick_mode_started_at": null,
+    "quick_mode_completed_at": null,
+    "auto_decisions": []
+  },
+  "notes": "Initial template state. Quick mode is disabled by default and must be explicitly requested by the user or project config."
 }

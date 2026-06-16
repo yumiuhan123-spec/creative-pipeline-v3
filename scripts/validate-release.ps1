@@ -19,6 +19,7 @@ $required = @(
     "template\main-image-project\00_project\project.config.json",
     "template\main-image-project\00_project\workflow.state.json",
     "template\main-image-project\可编辑工作流提示词\P1_输入盘点指令.md",
+    "template\main-image-project\可编辑工作流提示词\P6_快速模式指令.md",
     "template\main-image-project\可编辑工作流提示词\P5_浏览器分发指令.md",
     "template\main-image-project\07_browser_jobs\scripts\distribute_prompts.mjs"
 )

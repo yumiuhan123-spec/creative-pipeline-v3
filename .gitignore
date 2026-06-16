@@ -9,6 +9,7 @@ Desktop.ini
 *.pem
 *.key
 install.json
+versioning/.work/
 
 node_modules/
 npm-debug.log*

@@ -1,7 +1,19 @@
 {
-  "workflow_version": "3.0",
+  "workflow_version": "3.2.0",
   "input_root": "01_inputs",
   "state_file": "00_project/status.json",
+  "run_modes": {
+    "default": "standard",
+    "standard": {
+      "instruction": null,
+      "stop_at_human_gates": true
+    },
+    "quick": {
+      "instruction": "可编辑工作流提示词/P6_快速模式指令.md",
+      "stop_at_human_gates": false,
+      "requires_explicit_request": true
+    }
+  },
   "human_review": {
     "entry": "人工审核区/人工审核与修改说明.md",
     "scheme_drafts": "04_scheme_drafts",

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Creative Pipeline V3 Release Analysis",
+  "type": "object",
+  "required": [
+    "recommended_bump",
+    "current_version",
+    "next_version",
+    "summary_for_user",
+    "changelog",
+    "risks",
+    "should_create_git_tag"
+  ],
+  "properties": {
+    "recommended_bump": {
+      "type": "string",
+      "enum": ["patch", "minor", "major"]
+    },
+    "current_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "next_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "summary_for_user": {
+      "type": "string",
+      "minLength": 1
+    },
+    "changelog": {
+      "type": "object",
+      "required": ["added", "changed", "fixed", "removed"],
+      "properties": {
+        "added": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "changed": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "fixed": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "removed": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "risks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "should_create_git_tag": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}
