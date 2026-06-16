@@ -10,6 +10,10 @@ param(
     [string]$ReleaseIntent = "",
     [ValidateSet("", "patch", "minor", "major")]
     [string]$BumpOverride = "",
+    [int]$AiTimeoutSec = 90,
+    [int]$MaxDiffChars = 12000,
+    [int]$MaxFileChars = 3000,
+    [int]$MaxSnapshotFiles = 12,
     [switch]$SkipAI,
     [switch]$DryRun,
     [switch]$Approve
@@ -399,7 +403,23 @@ function Invoke-JsonScript {
 
     $text = ($output | Where-Object { "$_" -notmatch "^WARNING:" }) -join "`r`n"
     if (-not $text.Trim()) { return $null }
-    return $text | ConvertFrom-Json
+    try {
+        return $text | ConvertFrom-Json
+    }
+    catch {
+        $start = $text.LastIndexOf("{")
+        while ($start -ge 0) {
+            $candidate = $text.Substring($start).Trim()
+            try {
+                return $candidate | ConvertFrom-Json
+            }
+            catch {
+                if ($start -eq 0) { break }
+                $start = $text.LastIndexOf("{", $start - 1)
+            }
+        }
+        throw
+    }
 }
 
 function Invoke-Release {
@@ -421,6 +441,10 @@ function Invoke-Release {
     )
     if ($ReleaseIntent) { $releaseArgs += @("-ReleaseIntent", $ReleaseIntent) }
     if ($BumpOverride) { $releaseArgs += @("-BumpOverride", $BumpOverride) }
+    if ($AiTimeoutSec) { $releaseArgs += @("-AiTimeoutSec", $AiTimeoutSec) }
+    if ($MaxDiffChars) { $releaseArgs += @("-MaxDiffChars", $MaxDiffChars) }
+    if ($MaxFileChars) { $releaseArgs += @("-MaxFileChars", $MaxFileChars) }
+    if ($MaxSnapshotFiles) { $releaseArgs += @("-MaxSnapshotFiles", $MaxSnapshotFiles) }
     if ($SkipAI) { $releaseArgs += "-SkipAI" }
 
     $templatePreview = $null
