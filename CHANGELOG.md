@@ -6,6 +6,18 @@
 - minor：新增功能且兼容旧项目，例如 `3.0.1 -> 3.1.0`
 - major：架构大改或不兼容旧项目，例如 `3.x -> 4.0.0`
 
+## 3.2.3 - 2026-06-16
+
+### Changed
+
+- 更新 README.md 引用 VERSION.json
+- 更新 project-manager/README.md 文档
+- 改进 validate-release.ps1 验证脚本
+
+### Risks
+
+- 新增 tests/run-maintenance-tests.ps1 未跟踪，可能遗漏测试
+- 仅修改文档和脚本，风险较低
 ## 3.2.2 - 2026-06-16
 
 ### Changed
@@ -84,5 +96,6 @@
 
 - 首次整理为可上传 GitHub 的公开项目结构。
 - 包含 Codex Skill、标准项目模板、安装脚本、环境检查脚本和浏览器分发脚本。
+
 
 

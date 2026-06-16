@@ -14,6 +14,7 @@ $required = @(
     "docs\development.md",
     "docs\workflow-state.md",
     "docs\weak-codex-test.md",
+    "tests\run-maintenance-tests.ps1",
     "versioning\README.md",
     "template\main-image-project\00_project\workflow.json",
     "template\main-image-project\00_project\project.config.json",
@@ -73,6 +74,19 @@ $forbiddenFiles = Get-ChildItem -LiteralPath $repoRoot -Recurse -Force |
     }
 foreach ($file in $forbiddenFiles) {
     $errors += "Forbidden browser data: $($file.FullName)"
+}
+
+if (-not $env:CPV3_SKIP_MAINTENANCE_TESTS) {
+    $maintenanceTests = Join-Path $repoRoot "tests\run-maintenance-tests.ps1"
+    if (-not (Test-Path -LiteralPath $maintenanceTests)) {
+        $errors += "Missing maintenance tests: tests\run-maintenance-tests.ps1"
+    }
+    else {
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $maintenanceTests -RepoRoot $repoRoot | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            $errors += "Maintenance tests failed."
+        }
+    }
 }
 
 if ($errors.Count) {

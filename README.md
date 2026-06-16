@@ -2,7 +2,7 @@
 
 Creative Pipeline V3 是一个面向 Codex 的文件驱动工作流，用来把零散产品资料整理成主图方案，并通过已登录的 Edge/ChatGPT 页面并发提交六张主图提示词。
 
-当前版本：`3.2.0`，定位为“快速模式功能版”。
+当前仓库版本见 `VERSION.json`。主图模板版本当前为 `3.2.0`，定位为“快速模式功能版”。
 
 ## 四个位置
 
@@ -144,6 +144,20 @@ tests/                     # 自动测试和弱 Codex 测试
 
 ```text
 versioning/README.md
+```
+
+## 维护测试
+
+开发或发布前可以运行维护测试层。它不需要真实产品图片，主要检查四室状态、版本地图、模板同步预览、变更收集、归档 dry-run 和发布 dry-run：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\tests\run-maintenance-tests.ps1"
+```
+
+DeepSeek 连通性测试默认不跑，避免日常发布被网络影响；需要时显式开启：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\tests\run-maintenance-tests.ps1" -IncludeDeepSeek
 ```
 
 ## 当前限制

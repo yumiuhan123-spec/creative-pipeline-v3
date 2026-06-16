@@ -16,6 +16,8 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scrip
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" release -DryRun -SkipAI -BumpOverride patch -ReleaseIntent "Describe the completed change"
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" release -Approve -SkipAI -BumpOverride patch -ReleaseIntent "Describe the completed change"
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" release -DryRun -AiTimeoutSec 90 -MaxSnapshotFiles 12 -MaxFileChars 3000 -ReleaseIntent "Describe the completed change"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\tests\run-maintenance-tests.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\tests\run-maintenance-tests.ps1" -IncludeDeepSeek
 ```
 
 ## Safety
@@ -25,5 +27,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scrip
 - `rebuild-archive` creates archives from Git tags and does not touch working projects.
 - `release` runs the version manager, uses the four-room archive root, previews template sync, and reports final workspace status.
 - `release` can call DeepSeek for release analysis by comparing previous and current changed-file snapshots; `-AiTimeoutSec` bounds the AI wait, while `-MaxSnapshotFiles` and `-MaxFileChars` bound the content sent for analysis.
+- `tests\run-maintenance-tests.ps1` checks the maintenance layer without requiring product images. The DeepSeek network test is opt-in with `-IncludeDeepSeek`.
+- `scripts\validate-release.ps1` runs the maintenance tests unless `CPV3_SKIP_MAINTENANCE_TESTS=1` is set by a child dry-run.
 - Write operations require `-Approve`; use `-DryRun` to preview.
 - The manager never copies from the studio back into the template room.
