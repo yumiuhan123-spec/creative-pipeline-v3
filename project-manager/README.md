@@ -11,6 +11,10 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scrip
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" check-archives
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" sync-template -DryRun
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" sync-template -Approve
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" sync-skill -DryRun
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" sync-skill -Approve
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" update-workbench-context -DryRun
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" update-workbench-context -Approve
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" rebuild-archive -Tag v3.2.0 -DryRun
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" rebuild-archive -Tag v3.2.0 -Approve
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\project-manager\scripts\project-manager.ps1" release -DryRun -SkipAI -BumpOverride patch -ReleaseIntent "Describe the completed change"
@@ -24,8 +28,10 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\tests\run-maintenance
 
 - `status`, `version-map`, and `check-archives` are read-only.
 - `sync-template` backs up the current template before replacing it.
+- `sync-skill` copies the repository `creative-pipeline-v3` Skill into the Codex skills folder.
+- `update-workbench-context` refreshes the standard workbench handoff context with the current version, tags, and Git ahead count.
 - `rebuild-archive` creates archives from Git tags and does not touch working projects.
-- `release` runs the version manager, uses the four-room archive root, previews template sync, and reports final workspace status.
+- `release` runs the version manager, uses the four-room archive root, previews template sync, syncs the installed Skill, refreshes the workbench context, and reports final workspace status.
 - `release` can call DeepSeek for release analysis by comparing previous and current changed-file snapshots; `-AiTimeoutSec` bounds the AI wait, while `-MaxSnapshotFiles` and `-MaxFileChars` bound the content sent for analysis.
 - `tests\run-maintenance-tests.ps1` checks the maintenance layer without requiring product images. The DeepSeek network test is opt-in with `-IncludeDeepSeek`.
 - `scripts\validate-release.ps1` runs the maintenance tests unless `CPV3_SKIP_MAINTENANCE_TESTS=1` is set by a child dry-run.

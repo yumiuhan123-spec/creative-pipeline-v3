@@ -6,6 +6,22 @@
 - minor：新增功能且兼容旧项目，例如 `3.0.1 -> 3.1.0`
 - major：架构大改或不兼容旧项目，例如 `3.x -> 4.0.0`
 
+## 3.3.0 - 2026-06-16
+
+### Added
+
+- 新增 sync-skill 命令
+- 新增 update-workbench-context 命令
+- 新增 WorkbenchRoot 和 CodexHome 参数
+
+### Changed
+
+- project-manager.ps1 增加新命令和参数支持
+
+### Risks
+
+- 新命令可能影响现有工作流兼容性
+- 新增参数需确保与现有配置不冲突
 ## 3.2.3 - 2026-06-16
 
 ### Changed
@@ -96,6 +112,7 @@
 
 - 首次整理为可上传 GitHub 的公开项目结构。
 - 包含 Codex Skill、标准项目模板、安装脚本、环境检查脚本和浏览器分发脚本。
+
 
 
 

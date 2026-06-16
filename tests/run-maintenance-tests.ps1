@@ -108,6 +108,30 @@ function Test-ProjectManagerSyncTemplateDryRun {
     } | Out-Null
 }
 
+function Test-ProjectManagerSyncSkillDryRun {
+    $script = Join-Path $RepoRoot "project-manager\scripts\project-manager.ps1"
+    Invoke-JsonCommand -Name "project-manager sync-skill dry-run" -Arguments @(
+        "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $script, "sync-skill", "-RepoRoot", $RepoRoot, "-DryRun"
+    ) -Assert {
+        param($json)
+        Assert-True ($json.dry_run -eq $true) "sync-skill did not run in dry-run mode."
+        Assert-True (Test-Path -LiteralPath $json.source) "Skill source is missing."
+        Assert-True ([bool]$json.target) "Skill target is missing."
+    } | Out-Null
+}
+
+function Test-ProjectManagerUpdateWorkbenchContextDryRun {
+    $script = Join-Path $RepoRoot "project-manager\scripts\project-manager.ps1"
+    Invoke-JsonCommand -Name "project-manager update-workbench-context dry-run" -Arguments @(
+        "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $script, "update-workbench-context", "-RepoRoot", $RepoRoot, "-DryRun"
+    ) -Assert {
+        param($json)
+        Assert-True ($json.dry_run -eq $true) "update-workbench-context did not run in dry-run mode."
+        Assert-True ([bool]$json.path) "Workbench context path is missing."
+        Assert-True ($json.repo_version -match "^[0-9]+\.[0-9]+\.[0-9]+$") "repo_version is not semantic."
+    } | Out-Null
+}
+
 function Test-CollectChanges {
     $script = Join-Path $RepoRoot "versioning\scripts\collect-changes.ps1"
     Invoke-JsonCommand -Name "versioning collect-changes" -Arguments @(
@@ -206,6 +230,8 @@ $tests = @(
     { Test-ProjectManagerStatus },
     { Test-ProjectManagerVersionMap },
     { Test-ProjectManagerSyncTemplateDryRun },
+    { Test-ProjectManagerSyncSkillDryRun },
+    { Test-ProjectManagerUpdateWorkbenchContextDryRun },
     { Test-CollectChanges },
     { Test-ArchiveDryRun },
     { Test-ReleaseDryRun },

@@ -1,11 +1,13 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("status", "version-map", "check-archives", "sync-template", "rebuild-archive", "release")]
+    [ValidateSet("status", "version-map", "check-archives", "sync-template", "sync-skill", "update-workbench-context", "rebuild-archive", "release")]
     [string]$Command = "status",
 
     [string]$RepoRoot = "",
     [string]$WorkspaceRoot = "",
+    [string]$WorkbenchRoot = "",
+    [string]$CodexHome = "",
     [string]$Tag = "",
     [string]$ReleaseIntent = "",
     [ValidateSet("", "patch", "minor", "major")]
@@ -26,6 +28,12 @@ if (-not $RepoRoot) {
 }
 if (-not $WorkspaceRoot) {
     $WorkspaceRoot = (Resolve-Path (Join-Path $RepoRoot "..\..")).Path
+}
+if (-not $WorkbenchRoot) {
+    $WorkbenchRoot = Join-Path (Join-Path $HOME "Desktop") "标准开发工作台"
+}
+if (-not $CodexHome) {
+    $CodexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $HOME ".codex" }
 }
 
 function Invoke-Git {
@@ -96,6 +104,64 @@ function Get-CurrentVersion {
     if (-not (Test-Path -LiteralPath $versionPath)) { return $null }
     $version = Get-Content -LiteralPath $versionPath -Raw -Encoding UTF8 | ConvertFrom-Json
     return $version.version
+}
+
+function Get-FileHashText {
+    param([string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }
+    return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+}
+
+function Get-InstalledSkillReport {
+    $source = Join-Path $RepoRoot "skill\creative-pipeline-v3"
+    $target = Join-Path $CodexHome "skills\creative-pipeline-v3"
+    $sourceSkill = Join-Path $source "SKILL.md"
+    $targetSkill = Join-Path $target "SKILL.md"
+    $sourceHash = Get-FileHashText -Path $sourceSkill
+    $targetHash = Get-FileHashText -Path $targetSkill
+
+    [pscustomobject]@{
+        name = "creative-pipeline-v3"
+        source = $source
+        target = $target
+        source_exists = (Test-Path -LiteralPath $source -PathType Container)
+        target_exists = (Test-Path -LiteralPath $target -PathType Container)
+        source_hash = $sourceHash
+        target_hash = $targetHash
+        in_sync = ($sourceHash -and $targetHash -and $sourceHash -eq $targetHash)
+    }
+}
+
+function Get-WorkbenchContextPath {
+    return (Join-Path $WorkbenchRoot "项目上下文_精简版.md")
+}
+
+function Get-WorkbenchContextReport {
+    $path = Get-WorkbenchContextPath
+    $repoVersion = Get-CurrentVersion
+    $git = Get-GitInfo
+    $tags = @($git.tags)
+    $content = if (Test-Path -LiteralPath $path -PathType Leaf) {
+        Get-Content -LiteralPath $path -Raw -Encoding UTF8
+    }
+    else {
+        ""
+    }
+    $tagLine = "已有 tags: " + (($tags | Sort-Object) -join ", ")
+
+    [pscustomobject]@{
+        path = $path
+        exists = (Test-Path -LiteralPath $path -PathType Leaf)
+        expected_version = $repoVersion
+        expected_ahead = $git.ahead
+        expected_tag_line = $tagLine
+        in_sync = (
+            $content.Contains($repoVersion) -and
+            $content.Contains("本地 main 领先 origin/main $($git.ahead) 个提交") -and
+            $content.Contains($tagLine)
+        )
+    }
 }
 
 function Get-GitInfo {
@@ -171,6 +237,8 @@ function New-StatusReport {
     $sourceTemplateVersion = Get-TemplateVersion -TemplatePath $sourceTemplate
     $targetTemplateVersion = Get-TemplateVersion -TemplatePath $templateTarget
     $git = Get-GitInfo
+    $installedSkill = Get-InstalledSkillReport
+    $workbenchContext = Get-WorkbenchContextReport
     $archives = Get-ArchiveVersions
     $gaps = Get-TagArchiveGaps
     $projects = @()
@@ -197,6 +265,12 @@ function New-StatusReport {
     if ($git.dirty) {
         $recommendations.Add("Working tree has uncommitted changes.")
     }
+    if (-not $installedSkill.in_sync) {
+        $recommendations.Add("Installed Codex skill is behind source. Run sync-skill.")
+    }
+    if (-not $workbenchContext.in_sync) {
+        $recommendations.Add("Workbench context is stale. Run update-workbench-context.")
+    }
     if ($recommendations.Count -eq 0) {
         $recommendations.Add("Workspace looks consistent.")
     }
@@ -215,6 +289,8 @@ function New-StatusReport {
             template_room = $targetTemplateVersion
         }
         git = $git
+        installed_skill = $installedSkill
+        workbench_context = $workbenchContext
         archives = [pscustomobject]@{
             root = $archiveRoot
             versions = $archives
@@ -294,6 +370,104 @@ function Invoke-SyncTemplate {
     Copy-Directory -Source $target -Destination $backup
     Remove-Item -LiteralPath $target -Recurse -Force
     Copy-Directory -Source $source -Destination $target
+    return $result
+}
+
+function Invoke-SyncSkill {
+    $source = Join-Path $RepoRoot "skill\creative-pipeline-v3"
+    $target = Join-Path $CodexHome "skills\creative-pipeline-v3"
+    if (-not (Test-Path -LiteralPath $source -PathType Container)) {
+        throw "Missing skill source: $source"
+    }
+
+    $before = Get-InstalledSkillReport
+    $result = [pscustomobject]@{
+        dry_run = [bool]$DryRun
+        source = $source
+        target = $target
+        before = $before
+    }
+    if ($DryRun) { return $result }
+    if (-not $Approve) { throw "sync-skill requires -Approve or -DryRun." }
+
+    New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null
+    if (Test-Path -LiteralPath $target) {
+        Remove-Item -LiteralPath $target -Recurse -Force
+    }
+    Copy-Directory -Source $source -Destination $target
+
+    $configRoot = Join-Path $env:LOCALAPPDATA "CreativePipelineV3"
+    $runtimeRoot = Join-Path $configRoot "runtime"
+    New-Item -ItemType Directory -Path $configRoot -Force | Out-Null
+    [ordered]@{
+        installed_at = (Get-Date).ToString("o")
+        repository_root = $RepoRoot
+        template_root = (Join-Path $RepoRoot "template\main-image-project")
+        skill_path = $target
+        runtime_root = $runtimeRoot
+    } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $configRoot "install.json") -Encoding UTF8
+
+    $result | Add-Member -NotePropertyName after -NotePropertyValue (Get-InstalledSkillReport)
+    return $result
+}
+
+function Update-TextOrAppend {
+    param(
+        [string]$Content,
+        [string]$Pattern,
+        [string]$Replacement
+    )
+
+    if ([regex]::IsMatch($Content, $Pattern, [System.Text.RegularExpressions.RegexOptions]::Singleline)) {
+        return [regex]::Replace($Content, $Pattern, $Replacement, [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    }
+    return ($Content.TrimEnd() + "`r`n" + $Replacement + "`r`n")
+}
+
+function Invoke-UpdateWorkbenchContext {
+    $path = Get-WorkbenchContextPath
+    $repoVersion = Get-CurrentVersion
+    $sourceTemplate = Join-Path $RepoRoot "template\main-image-project"
+    $sourceTemplateVersion = Get-TemplateVersion -TemplatePath $sourceTemplate
+    $git = Get-GitInfo
+    $tags = @($git.tags | Sort-Object)
+    $tagLine = "已有 tags: " + ($tags -join ", ")
+    $archiveLine = "v$repoVersion 已有档案室快照"
+    $before = Get-WorkbenchContextReport
+
+    $result = [pscustomobject]@{
+        dry_run = [bool]$DryRun
+        path = $path
+        before = $before
+        repo_version = $repoVersion
+        template_version = $sourceTemplateVersion
+        ahead = $git.ahead
+        tags = $tags
+    }
+    if ($DryRun) { return $result }
+    if (-not $Approve) { throw "update-workbench-context requires -Approve or -DryRun." }
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+        throw "Workbench context file not found: $path"
+    }
+
+    $content = Get-Content -LiteralPath $path -Raw -Encoding UTF8
+    $content = Update-TextOrAppend -Content $content `
+        -Pattern "当前仓库版本：\s*```text\s*.*?\s*```" `
+        -Replacement "当前仓库版本：`r`n`r`n```text`r`n$repoVersion`r`n```"
+    $content = Update-TextOrAppend -Content $content `
+        -Pattern "当前模板版本：\s*```text\s*.*?\s*```" `
+        -Replacement "当前模板版本：`r`n`r`n```text`r`n$sourceTemplateVersion`r`n```"
+    $content = [regex]::Replace($content, "这是正常状态：.*?所以模板仍是 .*?。", "这是正常状态：$repoVersion 是维护体系更新，没有改主图模板本体，所以模板仍是 $sourceTemplateVersion。")
+    $content = [regex]::Replace($content, "本地 main 领先 origin/main \d+ 个提交", "本地 main 领先 origin/main $($git.ahead) 个提交")
+    $content = [regex]::Replace($content, "已有 tags: .*", $tagLine)
+    $content = [regex]::Replace($content, "v\d+\.\d+\.\d+ 已有档案室快照", $archiveLine)
+    $content = [regex]::Replace($content, "1\. 本地 main 领先 GitHub \d+ 个提交，当前没有立即 push 需求。", "1. 本地 main 领先 GitHub $($git.ahead) 个提交，当前没有立即 push 需求。")
+    if ($content -notmatch "项目管理器已经有 release 总控、DeepSeek 发布分析和维护测试层") {
+        $content = [regex]::Replace($content, "2\. 项目管理器.*", "2. 项目管理器已经有 release 总控、DeepSeek 发布分析和维护测试层，并会检查/同步已安装 skill 与工作台上下文。")
+    }
+
+    Set-Content -LiteralPath $path -Value $content -Encoding UTF8
+    $result | Add-Member -NotePropertyName after -NotePropertyValue (Get-WorkbenchContextReport)
     return $result
 }
 
@@ -449,16 +623,24 @@ function Invoke-Release {
 
     $templatePreview = $null
     $templateSync = $null
+    $skillPreview = $null
+    $skillSync = $null
+    $contextPreview = $null
+    $contextUpdate = $null
 
     if ($DryRun) {
         $releaseArgs += "-DryRun"
         $releaseResult = Invoke-JsonScript -Arguments $releaseArgs
         $templatePreview = Invoke-SyncTemplate
+        $skillPreview = Invoke-SyncSkill
+        $contextPreview = Invoke-UpdateWorkbenchContext
         return [pscustomobject]@{
             dry_run = $true
             status_before = $before
             release_preview = $releaseResult
             template_sync_preview = $templatePreview
+            skill_sync_preview = $skillPreview
+            workbench_context_preview = $contextPreview
         }
     }
 
@@ -495,6 +677,29 @@ function Invoke-Release {
         )
     }
 
+    $skillSync = Invoke-JsonScript -Arguments @(
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", $script,
+        "sync-skill",
+        "-RepoRoot", $RepoRoot,
+        "-WorkspaceRoot", $WorkspaceRoot,
+        "-WorkbenchRoot", $WorkbenchRoot,
+        "-CodexHome", $CodexHome,
+        "-Approve"
+    )
+    $contextUpdate = Invoke-JsonScript -Arguments @(
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", $script,
+        "update-workbench-context",
+        "-RepoRoot", $RepoRoot,
+        "-WorkspaceRoot", $WorkspaceRoot,
+        "-WorkbenchRoot", $WorkbenchRoot,
+        "-CodexHome", $CodexHome,
+        "-Approve"
+    )
+
     $after = New-StatusReport
     return [pscustomobject]@{
         dry_run = $false
@@ -502,6 +707,8 @@ function Invoke-Release {
         release_result = $releaseResult
         template_sync_preview = $templatePreview
         template_sync_result = $templateSync
+        skill_sync_result = $skillSync
+        workbench_context_result = $contextUpdate
         status_after = $after
     }
 }
@@ -517,6 +724,8 @@ switch ($Command) {
             source_template_version = $report.versions.source_template
             template_room_version = $report.versions.template_room
             git_tags = $report.git.tags
+            installed_skill = $report.installed_skill
+            workbench_context = $report.workbench_context
             archive_versions = $report.archives.versions
             missing_tag_archives = $report.archives.missing_tag_archives
         } | ConvertTo-Json -Depth 10
@@ -529,6 +738,12 @@ switch ($Command) {
     }
     "sync-template" {
         Invoke-SyncTemplate | ConvertTo-Json -Depth 10
+    }
+    "sync-skill" {
+        Invoke-SyncSkill | ConvertTo-Json -Depth 10
+    }
+    "update-workbench-context" {
+        Invoke-UpdateWorkbenchContext | ConvertTo-Json -Depth 10
     }
     "rebuild-archive" {
         Invoke-RebuildArchive | ConvertTo-Json -Depth 10
